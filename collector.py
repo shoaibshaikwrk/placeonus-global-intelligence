@@ -100,34 +100,11 @@ def market_data():
 
 
 TRADE_REPORTERS = [
-    ('842', 'United States'),
-    ('156', 'China'),
-    ('356', 'India'),
-    ('682', 'Saudi Arabia'),
-    ('784', 'United Arab Emirates'),
-    ('276', 'Germany'),
-    ('826', 'United Kingdom'),
-    ('392', 'Japan'),
-    ('410', 'South Korea'),
-    ('124', 'Canada'),
+    ('842', 'United States'), ('156', 'China'), ('356', 'India'),
+    ('682', 'Saudi Arabia'), ('784', 'United Arab Emirates'),
+    ('276', 'Germany'), ('826', 'United Kingdom'), ('392', 'Japan'),
+    ('410', 'South Korea'), ('124', 'Canada')
 ]
-
-
-def comtrade_rows(reporter_code, period):
-    params = urllib.parse.urlencode({
-        'reporterCode': reporter_code,
-        'period': str(period),
-        'flowCode': 'M',
-        'cmdCode': 'AG2',
-        'partnerCode': '0',
-        'partner2Code': '0',
-        'customsCode': 'C00',
-        'motCode': '0',
-        'maxRecords': '100'
-    })
-    url = 'https://comtradeapi.un.org/public/v1/preview/C/A/HS?' + params
-    raw = fetch_json(url, timeout=40)
-    return raw.get('data') or []
 
 
 def first_value(row, *names):
@@ -138,41 +115,199 @@ def first_value(row, *names):
     return None
 
 
+def as_number(value):
+    try:
+        return float(value) if value not in (None, '') else None
+    except Exception:
+        return None
+
+
+def comtrade_rows(reporter_code, period, partner_code='0', max_records=100):
+    params = {
+        'reporterCode': reporter_code,
+        'period': str(period),
+        'flowCode': 'M',
+        'cmdCode': 'AG2',
+        'partnerCode': partner_code,
+        'partner2Code': '0',
+        'customsCode': 'C00',
+        'motCode': '0',
+        'maxRecords': str(max_records)
+    }
+    url = 'https://comtradeapi.un.org/public/v1/preview/C/A/HS?' + urllib.parse.urlencode(params)
+    raw = fetch_json(url, timeout=40)
+    return raw.get('data') or []
+
+
 def normalize_trade_row(row):
-    value = first_value(row, 'primaryValue', 'TradeValue', 'tradeValue', 'fobvalue', 'cifvalue')
-    qty = first_value(row, 'qty', 'Qty', 'quantity', 'netWgt', 'NetWeight')
-    try:
-        value_num = float(value) if value is not None else None
-    except Exception:
-        value_num = None
-    try:
-        qty_num = float(qty) if qty is not None else None
-    except Exception:
-        qty_num = None
-    unit_value = None
-    if value_num is not None and qty_num not in (None, 0):
-        unit_value = value_num / qty_num
+    value_num = as_number(first_value(row, 'primaryValue', 'TradeValue', 'tradeValue', 'fobvalue', 'cifvalue'))
+    qty_raw = first_value(row, 'qty', 'Qty', 'quantity', 'netWgt', 'NetWeight')
+    qty_num = as_number(qty_raw)
+    unit = first_value(row, 'qtyUnitAbbr', 'QtyUnitAbbr', 'qtyUnitCode', 'netWgtUnit')
+    if unit in (-1, '-1', 0, '0'):
+        unit = None
+    unit_value = value_num / qty_num if value_num is not None and qty_num not in (None, 0) else None
     return {
         'hs_code': str(first_value(row, 'cmdCode', 'CmdCode', 'commodityCode') or ''),
-        'product': first_value(row, 'cmdDescE', 'cmdDesc', 'CmdDescE', 'commodityDesc') or 'Unspecified commodity',
+        'product': first_value(row, 'cmdDescE', 'cmdDesc', 'CmdDescE', 'commodityDesc') or 'HS commodity',
         'partner': first_value(row, 'partnerDesc', 'PartnerDesc', 'partnerName') or 'World',
+        'partner_code': str(first_value(row, 'partnerCode', 'PartnerCode') or ''),
         'import_value_usd': value_num,
-        'quantity': qty_num,
-        'quantity_unit': first_value(row, 'qtyUnitAbbr', 'QtyUnitAbbr', 'qtyUnitCode', 'netWgtUnit') or ('kg' if first_value(row, 'netWgt', 'NetWeight') is not None else None),
+        'quantity': qty_num if qty_num not in (0, None) else None,
+        'quantity_unit': unit or ('kg' if first_value(row, 'netWgt', 'NetWeight') not in (None, 0, '0') else None),
         'unit_value_usd': unit_value,
+        'port': None,
+        'port_code': None,
+        'source': 'UN Comtrade'
+    }
+
+
+def census_table(url):
+    raw = fetch_json(url, timeout=45)
+    if not isinstance(raw, list) or len(raw) < 2:
+        return []
+    headers = raw[0]
+    return [dict(zip(headers, row)) for row in raw[1:]]
+
+
+def census_latest_month():
+    now = datetime.now(timezone.utc)
+    year, month = now.year, now.month - 2
+    if month <= 0:
+        year -= 1
+        month += 12
+    return f'{year:04d}-{month:02d}'
+
+
+def census_us_origin_rows(period):
+    key = os.getenv('CENSUS_API_KEY', '').strip()
+    if not key:
+        return []
+    params = urllib.parse.urlencode({
+        'get': 'NAME,I_COMMODITY_LABEL,I_COMMODITY,GEN_VAL_MO,GEN_VAL_YR,YEAR,MONTH',
+        'for': 'usitc standard countries and areas:*',
+        'time': period,
+        'key': key
+    })
+    url = 'https://api.census.gov/data/timeseries/intltrade/imports/hsimport?' + params
+    return census_table(url)
+
+
+def census_us_port_rows(period):
+    key = os.getenv('CENSUS_API_KEY', '').strip()
+    if not key:
+        return []
+    fields = 'PORT_NAME,US_PORT,CTY_CODE,CTY_DESC,I_COMMODITY,I_COMMODITY_SDESC,GEN_VAL_MO,GEN_VAL_YR,VES_WGT_MO,VES_WGT_YR,CNT_VAL_MO,CNT_VAL_YR'
+    # The Census geography model nests ports under customs districts. The wildcard-parent
+    # request is attempted first; if unsupported by the API, the caller preserves origin data
+    # and reports port status instead of fabricating a port.
+    params = urllib.parse.urlencode({
+        'get': fields,
+        'for': 'port:*',
+        'in': 'customs district:*',
+        'time': period,
+        'key': key
+    })
+    url = 'https://api.census.gov/data/timeseries/intltrade/imports/porthsimport?' + params
+    return census_table(url)
+
+
+def build_us_census_trade():
+    period = census_latest_month()
+    origins, ports, errors = [], [], []
+    try:
+        origins = census_us_origin_rows(period)
+    except Exception as exc:
+        errors.append('origin: ' + str(exc)[:140])
+    try:
+        ports = census_us_port_rows(period)
+    except Exception as exc:
+        errors.append('ports: ' + str(exc)[:140])
+
+    origin_goods = []
+    for row in origins:
+        value = as_number(row.get('GEN_VAL_YR') or row.get('GEN_VAL_MO'))
+        hs = str(row.get('I_COMMODITY') or '')
+        country = row.get('NAME') or row.get('CTY_DESC')
+        if not hs or not country or value is None or value <= 0:
+            continue
+        origin_goods.append({
+            'hs_code': hs,
+            'product': row.get('I_COMMODITY_LABEL') or 'HS commodity',
+            'partner': country,
+            'partner_code': str(row.get('usitc standard countries and areas') or ''),
+            'import_value_usd': value,
+            'quantity': None,
+            'quantity_unit': None,
+            'unit_value_usd': None,
+            'port': None,
+            'port_code': None,
+            'source': 'U.S. Census International Trade'
+        })
+
+    port_goods, port_totals = [], {}
+    for row in ports:
+        value = as_number(row.get('GEN_VAL_YR') or row.get('GEN_VAL_MO'))
+        hs = str(row.get('I_COMMODITY') or '')
+        port_name = row.get('PORT_NAME')
+        origin = row.get('CTY_DESC') or 'All trading partners'
+        if not hs or not port_name or value is None or value <= 0:
+            continue
+        weight = as_number(row.get('VES_WGT_YR') or row.get('VES_WGT_MO'))
+        port_code = str(row.get('US_PORT') or row.get('port') or '')
+        port_goods.append({
+            'hs_code': hs,
+            'product': row.get('I_COMMODITY_SDESC') or 'HS commodity',
+            'partner': origin,
+            'partner_code': str(row.get('CTY_CODE') or ''),
+            'import_value_usd': value,
+            'quantity': weight if weight not in (None, 0) else None,
+            'quantity_unit': 'kg' if weight not in (None, 0) else None,
+            'unit_value_usd': value / weight if weight not in (None, 0) else None,
+            'port': port_name,
+            'port_code': port_code,
+            'containerized_value_usd': as_number(row.get('CNT_VAL_YR') or row.get('CNT_VAL_MO')),
+            'source': 'U.S. Census International Trade'
+        })
+        port_totals[(port_code, port_name)] = port_totals.get((port_code, port_name), 0) + value
+
+    # Prefer port-specific rows because they include both origin-country and port-of-entry.
+    goods = sorted(port_goods if port_goods else origin_goods, key=lambda x: x.get('import_value_usd') or 0, reverse=True)[:250]
+    top_ports = [
+        {'code': code, 'name': name, 'import_value_usd': value, 'source': 'U.S. Census International Trade'}
+        for (code, name), value in sorted(port_totals.items(), key=lambda kv: kv[1], reverse=True)[:15]
+    ]
+    return {
+        'period': period,
+        'goods': goods,
+        'ports': top_ports,
+        'port_live': bool(port_goods),
+        'origin_live': bool(origin_goods or port_goods),
+        'errors': errors
     }
 
 
 def trade_data():
     current_year = datetime.now(timezone.utc).year
     candidate_years = [current_year - 1, current_year - 2]
-    countries = []
-    used_periods = set()
-    errors = []
+    countries, used_periods, errors = [], set(), []
+
+    census_us = build_us_census_trade()
+    if census_us['goods']:
+        countries.append({
+            'code': '842', 'name': 'United States', 'period': census_us['period'],
+            'goods': census_us['goods'], 'ports': census_us['ports'],
+            'origin_live': census_us['origin_live'], 'port_live': census_us['port_live'],
+            'source': 'U.S. Census International Trade'
+        })
+        used_periods.add(census_us['period'])
+    if census_us['errors']:
+        errors.extend(census_us['errors'])
 
     for reporter_code, reporter_name in TRADE_REPORTERS:
-        rows = []
-        used_period = None
+        if reporter_code == '842' and census_us['goods']:
+            continue
+        rows, used_period = [], None
         for period in candidate_years:
             try:
                 rows = comtrade_rows(reporter_code, period)
@@ -180,35 +315,33 @@ def trade_data():
                     used_period = period
                     break
             except Exception as exc:
-                errors.append(f'{reporter_name}: {str(exc)[:80]}')
+                errors.append(f'{reporter_name}: {str(exc)[:100]}')
         if not rows:
             continue
-
-        goods = []
-        for row in rows:
-            item = normalize_trade_row(row)
-            if item['hs_code'] and item['hs_code'] not in ('TOTAL', 'AG2') and item['import_value_usd'] is not None:
-                goods.append(item)
+        goods = [normalize_trade_row(r) for r in rows]
+        goods = [g for g in goods if g['hs_code'] and g['hs_code'] not in ('TOTAL', 'AG2') and g['import_value_usd'] is not None]
         goods.sort(key=lambda x: x.get('import_value_usd') or 0, reverse=True)
-        goods = goods[:30]
         if goods:
-            countries.append({'code': reporter_code, 'name': reporter_name, 'period': str(used_period), 'goods': goods})
+            countries.append({
+                'code': reporter_code, 'name': reporter_name, 'period': str(used_period),
+                'goods': goods[:40], 'ports': [], 'origin_live': False, 'port_live': False,
+                'source': 'UN Comtrade'
+            })
             used_periods.add(str(used_period))
 
     if countries:
-        period_label = ', '.join(sorted(used_periods, reverse=True))
         return {
-            'source': 'UN Comtrade',
+            'source': 'UN Comtrade + U.S. Census International Trade',
             'live': True,
-            'status': f'Official annual merchandise import data for {len(countries)} countries.',
-            'period': period_label,
+            'status': 'Official trade data. U.S. rows use Census origin/port detail when available; other countries use UN Comtrade aggregate trade data.',
+            'period': ', '.join(sorted(used_periods, reverse=True)),
             'countries': countries,
+            'port_status': 'U.S. port-of-entry data connected' if census_us['port_live'] else 'U.S. Census origin data connected; port wildcard query did not return port rows in this refresh.',
+            'errors': errors[:8],
             'container': {
-                'source': 'Freight rate provider not connected',
-                'live': False,
-                'status': 'Container spot rates are separate from UN Comtrade and require a freight-rate provider.',
-                'global_40ft_usd': None,
-                'routes': []
+                'source': 'Freight rate provider not connected', 'live': False,
+                'status': 'Container spot rates require a freight-rate provider; Census containerized value is trade value, not a freight quote.',
+                'global_40ft_usd': None, 'routes': []
             }
         }
 
@@ -216,37 +349,22 @@ def trade_data():
     if previous.get('countries'):
         previous['live'] = False
         previous['stale'] = True
-        previous['status'] = 'UN Comtrade refresh failed; showing the previous successful snapshot.'
-        if errors:
-            previous['error'] = '; '.join(errors[:5])
+        previous['status'] = 'Trade refresh failed; showing the previous successful snapshot.'
+        previous['errors'] = errors[:8]
         return previous
-
     return {
-        'source': 'UN Comtrade',
-        'live': False,
-        'status': 'UN Comtrade returned no usable import records in this refresh.',
-        'period': None,
-        'countries': [],
-        'error': '; '.join(errors[:5]) if errors else None,
-        'container': {
-            'source': 'Freight rate provider not connected',
-            'live': False,
-            'status': 'Container spot rates are separate from UN Comtrade and require a freight-rate provider.',
-            'global_40ft_usd': None,
-            'routes': []
-        }
+        'source': 'UN Comtrade + U.S. Census International Trade', 'live': False,
+        'status': 'No usable trade records returned in this refresh.', 'period': None,
+        'countries': [], 'errors': errors[:8],
+        'container': {'source': 'Freight rate provider not connected', 'live': False, 'status': 'Container spot rates require a freight-rate provider.', 'global_40ft_usd': None, 'routes': []}
     }
 
 
 AISSTREAM_BOXES = [
-    [[22.0, 54.0], [28.5, 60.5]],
-    [[11.0, 41.0], [30.5, 45.5]],
-    [[29.0, 31.0], [31.5, 33.5]],
-    [[40.0, 27.0], [47.5, 42.5]],
-    [[0.0, 98.0], [6.5, 106.0]],
-    [[7.0, -83.0], [10.5, -77.0]],
-    [[50.5, 2.5], [53.0, 6.0]],
-    [[25.3, -80.7], [26.1, -79.6]],
+    [[22.0, 54.0], [28.5, 60.5]], [[11.0, 41.0], [30.5, 45.5]],
+    [[29.0, 31.0], [31.5, 33.5]], [[40.0, 27.0], [47.5, 42.5]],
+    [[0.0, 98.0], [6.5, 106.0]], [[7.0, -83.0], [10.5, -77.0]],
+    [[50.5, 2.5], [53.0, 6.0]], [[25.3, -80.7], [26.1, -79.6]]
 ]
 
 
@@ -254,27 +372,10 @@ async def collect_aisstream(duration_seconds=60, max_vessels=400):
     key = os.getenv('AISSTREAM_API_KEY', '').strip()
     if not key:
         return {'source': 'AISStream.io', 'live': False, 'status': 'AISSTREAM_API_KEY not configured', 'subscription_confirmed': False, 'messages_received': 0, 'items': []}
-
-    subscription = {
-        'APIKey': key,
-        'BoundingBoxes': AISSTREAM_BOXES,
-        'FilterMessageTypes': ['PositionReport', 'StandardClassBPositionReport', 'ExtendedClassBPositionReport']
-    }
-    vessels = {}
-    started = time.monotonic()
-    confirmation = False
-    total_messages = 0
-    last_message_type = None
-
+    subscription = {'APIKey': key, 'BoundingBoxes': AISSTREAM_BOXES, 'FilterMessageTypes': ['PositionReport', 'StandardClassBPositionReport', 'ExtendedClassBPositionReport']}
+    vessels, started, confirmation, total_messages, last_message_type = {}, time.monotonic(), False, 0, None
     try:
-        async with websockets.connect(
-            'wss://stream.aisstream.io/v0/stream',
-            open_timeout=10,
-            close_timeout=5,
-            ping_interval=20,
-            ping_timeout=20,
-            compression='deflate'
-        ) as ws:
+        async with websockets.connect('wss://stream.aisstream.io/v0/stream', open_timeout=10, close_timeout=5, ping_interval=20, ping_timeout=20, compression='deflate') as ws:
             await ws.send(json.dumps(subscription))
             while time.monotonic() - started < duration_seconds and len(vessels) < max_vessels:
                 remaining = duration_seconds - (time.monotonic() - started)
@@ -293,65 +394,23 @@ async def collect_aisstream(duration_seconds=60, max_vessels=400):
                 if msg_type == 'SubscriptionConfirmation':
                     confirmation = True
                     continue
-
                 meta = event.get('MetaData') or {}
                 body = (event.get('Message') or {}).get(msg_type, {}) or {}
-
                 mmsi = meta.get('MMSI') or body.get('UserID') or body.get('UserId')
-                lat = meta.get('Latitude')
-                if lat is None:
-                    lat = body.get('Latitude')
-                lon = meta.get('Longitude')
-                if lon is None:
-                    lon = body.get('Longitude')
-
+                lat = meta.get('Latitude') if meta.get('Latitude') is not None else body.get('Latitude')
+                lon = meta.get('Longitude') if meta.get('Longitude') is not None else body.get('Longitude')
                 if not mmsi or lat is None or lon is None:
                     continue
-
                 vessels[str(mmsi)] = {
-                    'name': (meta.get('ShipName') or '').strip() or f'MMSI {mmsi}',
-                    'mmsi': str(mmsi),
-                    'imo': None,
-                    'vessel_type': msg_type,
-                    'flag': None,
-                    'lat': lat,
-                    'lon': lon,
-                    'speed_knots': body.get('Sog'),
-                    'course': body.get('Cog'),
-                    'heading': body.get('TrueHeading'),
-                    'destination': None,
-                    'eta': None,
-                    'last_port': None,
-                    'timestamp': datetime.now(timezone.utc).isoformat(),
-                    'live': True
+                    'name': (meta.get('ShipName') or '').strip() or f'MMSI {mmsi}', 'mmsi': str(mmsi), 'imo': None,
+                    'vessel_type': msg_type, 'flag': None, 'lat': lat, 'lon': lon, 'speed_knots': body.get('Sog'),
+                    'course': body.get('Cog'), 'heading': body.get('TrueHeading'), 'destination': None, 'eta': None,
+                    'last_port': None, 'timestamp': datetime.now(timezone.utc).isoformat(), 'live': True
                 }
     except Exception as exc:
-        return {
-            'source': 'AISStream.io',
-            'live': False,
-            'status': 'AIS stream error: ' + str(exc)[:180],
-            'subscription_confirmed': confirmation,
-            'messages_received': total_messages,
-            'last_message_type': last_message_type,
-            'items': list(vessels.values())
-        }
-
-    if vessels:
-        status = f'live - {len(vessels)} vessels sampled in {duration_seconds}s'
-    elif confirmation:
-        status = f'connected and subscription confirmed, but no vessel positions arrived in {duration_seconds}s'
-    else:
-        status = f'WebSocket opened but subscription was not confirmed; {total_messages} messages received'
-
-    return {
-        'source': 'AISStream.io',
-        'live': bool(vessels),
-        'status': status,
-        'subscription_confirmed': confirmation,
-        'messages_received': total_messages,
-        'last_message_type': last_message_type,
-        'items': list(vessels.values())
-    }
+        return {'source': 'AISStream.io', 'live': False, 'status': 'AIS stream error: ' + str(exc)[:180], 'subscription_confirmed': confirmation, 'messages_received': total_messages, 'last_message_type': last_message_type, 'items': list(vessels.values())}
+    status = f'live - {len(vessels)} vessels sampled in {duration_seconds}s' if vessels else (f'connected and subscription confirmed, but no vessel positions arrived in {duration_seconds}s' if confirmation else f'WebSocket opened but subscription was not confirmed; {total_messages} messages received')
+    return {'source': 'AISStream.io', 'live': bool(vessels), 'status': status, 'subscription_confirmed': confirmation, 'messages_received': total_messages, 'last_message_type': last_message_type, 'items': list(vessels.values())}
 
 
 def vessel_data():
@@ -361,13 +420,7 @@ def vessel_data():
 def derive_risk(news):
     items = news.get('items', [])
     if not items:
-        return {
-            'source': 'PlaceOnUs derived from current headlines',
-            'live': False,
-            'scores': {},
-            'status': 'Risk score unavailable because there are no current news records.',
-            'method': 'Transparent keyword-pressure heuristic; AI model not yet enabled.'
-        }
+        return {'source': 'PlaceOnUs derived from current headlines', 'live': False, 'scores': {}, 'status': 'Risk score unavailable because there are no current news records.', 'method': 'Transparent keyword-pressure heuristic; AI model not yet enabled.'}
     text = ' '.join(i.get('headline', '').lower() for i in items)
     def count(words):
         return sum(text.count(w) for w in words)
@@ -376,18 +429,11 @@ def derive_risk(news):
     oil = min(100, 25 + count(['oil', 'crude', 'pipeline', 'refinery', 'opec']) * 5)
     freight = min(100, 20 + count(['freight', 'shipping', 'port']) * 5)
     insurance = min(100, round((geo + shipping) / 2))
-    return {
-        'source': 'PlaceOnUs derived from current headlines',
-        'live': bool(news.get('live')),
-        'scores': {'geopolitical': geo, 'oil_supply': oil, 'shipping': shipping, 'freight': freight, 'marine_insurance': insurance},
-        'status': 'Current' if news.get('live') else 'Calculated from the latest stored news snapshot.',
-        'method': 'Transparent keyword-pressure heuristic; AI model not yet enabled.'
-    }
+    return {'source': 'PlaceOnUs derived from current headlines', 'live': bool(news.get('live')), 'scores': {'geopolitical': geo, 'oil_supply': oil, 'shipping': shipping, 'freight': freight, 'marine_insurance': insurance}, 'status': 'Current' if news.get('live') else 'Calculated from the latest stored news snapshot.', 'method': 'Transparent keyword-pressure heuristic; AI model not yet enabled.'}
 
 
 def main():
     status = {'sources': {}}
-
     try:
         news = gdelt_news()
         write('news.json', news)
@@ -396,9 +442,7 @@ def main():
         previous = read_existing('news.json', {'source': 'GDELT', 'live': False, 'items': []}) or {'source': 'GDELT', 'live': False, 'items': []}
         if previous.get('items'):
             news = previous
-            news['live'] = False
-            news['stale'] = True
-            news['error'] = str(exc)
+            news['live'], news['stale'], news['error'] = False, True, str(exc)
             write('news.json', news)
             status['sources']['news'] = 'stale'
         else:
