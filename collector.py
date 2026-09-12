@@ -99,6 +99,145 @@ def market_data():
     return {'source': source or ['No market provider connected'], 'instruments': instruments, 'live': any(x.get('live') for x in instruments)}
 
 
+TRADE_REPORTERS = [
+    ('842', 'United States'),
+    ('156', 'China'),
+    ('356', 'India'),
+    ('682', 'Saudi Arabia'),
+    ('784', 'United Arab Emirates'),
+    ('276', 'Germany'),
+    ('826', 'United Kingdom'),
+    ('392', 'Japan'),
+    ('410', 'South Korea'),
+    ('124', 'Canada'),
+]
+
+
+def comtrade_rows(reporter_code, period):
+    params = urllib.parse.urlencode({
+        'reporterCode': reporter_code,
+        'period': str(period),
+        'flowCode': 'M',
+        'cmdCode': 'AG2',
+        'partnerCode': '0',
+        'partner2Code': '0',
+        'customsCode': 'C00',
+        'motCode': '0',
+        'maxRecords': '100'
+    })
+    url = 'https://comtradeapi.un.org/public/v1/preview/C/A/HS?' + params
+    raw = fetch_json(url, timeout=40)
+    return raw.get('data') or []
+
+
+def first_value(row, *names):
+    for name in names:
+        value = row.get(name)
+        if value not in (None, ''):
+            return value
+    return None
+
+
+def normalize_trade_row(row):
+    value = first_value(row, 'primaryValue', 'TradeValue', 'tradeValue', 'fobvalue', 'cifvalue')
+    qty = first_value(row, 'qty', 'Qty', 'quantity', 'netWgt', 'NetWeight')
+    try:
+        value_num = float(value) if value is not None else None
+    except Exception:
+        value_num = None
+    try:
+        qty_num = float(qty) if qty is not None else None
+    except Exception:
+        qty_num = None
+    unit_value = None
+    if value_num is not None and qty_num not in (None, 0):
+        unit_value = value_num / qty_num
+    return {
+        'hs_code': str(first_value(row, 'cmdCode', 'CmdCode', 'commodityCode') or ''),
+        'product': first_value(row, 'cmdDescE', 'cmdDesc', 'CmdDescE', 'commodityDesc') or 'Unspecified commodity',
+        'partner': first_value(row, 'partnerDesc', 'PartnerDesc', 'partnerName') or 'World',
+        'import_value_usd': value_num,
+        'quantity': qty_num,
+        'quantity_unit': first_value(row, 'qtyUnitAbbr', 'QtyUnitAbbr', 'qtyUnitCode', 'netWgtUnit') or ('kg' if first_value(row, 'netWgt', 'NetWeight') is not None else None),
+        'unit_value_usd': unit_value,
+    }
+
+
+def trade_data():
+    current_year = datetime.now(timezone.utc).year
+    candidate_years = [current_year - 1, current_year - 2]
+    countries = []
+    used_periods = set()
+    errors = []
+
+    for reporter_code, reporter_name in TRADE_REPORTERS:
+        rows = []
+        used_period = None
+        for period in candidate_years:
+            try:
+                rows = comtrade_rows(reporter_code, period)
+                if rows:
+                    used_period = period
+                    break
+            except Exception as exc:
+                errors.append(f'{reporter_name}: {str(exc)[:80]}')
+        if not rows:
+            continue
+
+        goods = []
+        for row in rows:
+            item = normalize_trade_row(row)
+            if item['hs_code'] and item['hs_code'] not in ('TOTAL', 'AG2') and item['import_value_usd'] is not None:
+                goods.append(item)
+        goods.sort(key=lambda x: x.get('import_value_usd') or 0, reverse=True)
+        goods = goods[:30]
+        if goods:
+            countries.append({'code': reporter_code, 'name': reporter_name, 'period': str(used_period), 'goods': goods})
+            used_periods.add(str(used_period))
+
+    if countries:
+        period_label = ', '.join(sorted(used_periods, reverse=True))
+        return {
+            'source': 'UN Comtrade',
+            'live': True,
+            'status': f'Official annual merchandise import data for {len(countries)} countries.',
+            'period': period_label,
+            'countries': countries,
+            'container': {
+                'source': 'Freight rate provider not connected',
+                'live': False,
+                'status': 'Container spot rates are separate from UN Comtrade and require a freight-rate provider.',
+                'global_40ft_usd': None,
+                'routes': []
+            }
+        }
+
+    previous = read_existing('trade.json', {}) or {}
+    if previous.get('countries'):
+        previous['live'] = False
+        previous['stale'] = True
+        previous['status'] = 'UN Comtrade refresh failed; showing the previous successful snapshot.'
+        if errors:
+            previous['error'] = '; '.join(errors[:5])
+        return previous
+
+    return {
+        'source': 'UN Comtrade',
+        'live': False,
+        'status': 'UN Comtrade returned no usable import records in this refresh.',
+        'period': None,
+        'countries': [],
+        'error': '; '.join(errors[:5]) if errors else None,
+        'container': {
+            'source': 'Freight rate provider not connected',
+            'live': False,
+            'status': 'Container spot rates are separate from UN Comtrade and require a freight-rate provider.',
+            'global_40ft_usd': None,
+            'routes': []
+        }
+    }
+
+
 AISSTREAM_BOXES = [
     [[22.0, 54.0], [28.5, 60.5]],
     [[11.0, 41.0], [30.5, 45.5]],
@@ -220,7 +359,16 @@ def vessel_data():
 
 
 def derive_risk(news):
-    text = ' '.join(i.get('headline', '').lower() for i in news.get('items', []))
+    items = news.get('items', [])
+    if not items:
+        return {
+            'source': 'PlaceOnUs derived from current headlines',
+            'live': False,
+            'scores': {},
+            'status': 'Risk score unavailable because there are no current news records.',
+            'method': 'Transparent keyword-pressure heuristic; AI model not yet enabled.'
+        }
+    text = ' '.join(i.get('headline', '').lower() for i in items)
     def count(words):
         return sum(text.count(w) for w in words)
     geo = min(100, 30 + count(['war', 'attack', 'missile', 'drone', 'sanction']) * 7)
@@ -230,8 +378,9 @@ def derive_risk(news):
     insurance = min(100, round((geo + shipping) / 2))
     return {
         'source': 'PlaceOnUs derived from current headlines',
-        'live': True,
+        'live': bool(news.get('live')),
         'scores': {'geopolitical': geo, 'oil_supply': oil, 'shipping': shipping, 'freight': freight, 'marine_insurance': insurance},
+        'status': 'Current' if news.get('live') else 'Calculated from the latest stored news snapshot.',
         'method': 'Transparent keyword-pressure heuristic; AI model not yet enabled.'
     }
 
@@ -260,6 +409,10 @@ def main():
     markets = market_data()
     write('markets.json', markets)
     status['sources']['markets'] = 'ok' if markets.get('live') else 'partial'
+
+    trade = trade_data()
+    write('trade.json', trade)
+    status['sources']['trade'] = 'ok' if trade.get('live') else 'stale' if trade.get('countries') else 'error'
 
     vessels = vessel_data()
     write('vessels.json', vessels)
