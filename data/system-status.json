@@ -1,10 +1,10 @@
 {
   "sources": {
-    "news": "ok",
+    "news": "error",
     "markets": "ok",
-    "vessels": "not_connected"
+    "vessels": "error"
   },
   "refresh_minutes": 10,
   "site": "news.placeonus.com",
-  "updated_at": "2026-09-12T21:07:51.282145+00:00"
+  "updated_at": "2026-09-12T21:11:03.479262+00:00"
 }

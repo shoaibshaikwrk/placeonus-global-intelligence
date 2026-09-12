@@ -1,7 +1,7 @@
 {
-  "source": "VesselFinder",
+  "source": "AISStream.io",
   "live": false,
-  "status": "Set VESSELFINDER_IMOS secret with comma-separated IMO numbers",
+  "status": "connected but no vessel messages received in sample window",
   "items": [],
-  "updated_at": "2026-09-12T21:07:51.282145+00:00"
+  "updated_at": "2026-09-12T21:11:03.479262+00:00"
 }
