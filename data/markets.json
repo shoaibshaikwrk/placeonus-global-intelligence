@@ -1,8 +1,24 @@
 {
   "source": [
-    "No market provider connected"
+    "EIA"
   ],
   "instruments": [
+    {
+      "name": "WTI",
+      "price": 97.26,
+      "trend": "official EIA spot",
+      "signal_score": null,
+      "period": "2026-09-09",
+      "live": true
+    },
+    {
+      "name": "Brent",
+      "price": 109.51,
+      "trend": "official EIA spot",
+      "signal_score": null,
+      "period": "2026-09-09",
+      "live": true
+    },
     {
       "name": "Gold",
       "price": null,
@@ -25,6 +41,6 @@
       "live": false
     }
   ],
-  "live": false,
-  "updated_at": "2026-09-12T18:58:43.023060+00:00"
+  "live": true,
+  "updated_at": "2026-09-12T20:59:17.394439+00:00"
 }
