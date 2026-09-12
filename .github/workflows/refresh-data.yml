@@ -9,6 +9,7 @@ on:
       - main
     paths:
       - 'collector.py'
+      - 'trade_enrichment.py'
       - '.github/workflows/refresh-data.yml'
 
 permissions:
@@ -21,7 +22,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,7 +43,9 @@ jobs:
           AISSTREAM_API_KEY: ${{ secrets.AISSTREAM_API_KEY }}
           MARKET_DATA_API_KEY: ${{ secrets.MARKET_DATA_API_KEY }}
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
-        run: python collector.py
+        run: |
+          python collector.py
+          python trade_enrichment.py
 
       - name: Commit changed snapshots
         run: |
