@@ -2,12 +2,12 @@
   "source": "PlaceOnUs derived from current headlines",
   "live": true,
   "scores": {
-    "geopolitical": 44,
+    "geopolitical": 37,
     "oil_supply": 25,
     "shipping": 31,
     "freight": 25,
-    "marine_insurance": 38
+    "marine_insurance": 34
   },
   "method": "Transparent keyword-pressure heuristic; AI model not yet enabled.",
-  "updated_at": "2026-09-12T20:59:17.394439+00:00"
+  "updated_at": "2026-09-12T21:07:51.282145+00:00"
 }
