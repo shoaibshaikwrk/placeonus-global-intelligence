@@ -2,9 +2,9 @@
   "sources": {
     "news": "error",
     "markets": "ok",
-    "vessels": "connected_no_positions"
+    "vessels": "ok"
   },
   "refresh_minutes": 10,
   "site": "news.placeonus.com",
-  "updated_at": "2026-09-12T21:18:04.335689+00:00"
+  "updated_at": "2026-09-12T21:47:51.442800+00:00"
 }
