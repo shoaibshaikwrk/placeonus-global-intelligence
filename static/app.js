@@ -1,0 +1,19 @@
+const $=s=>document.querySelector(s);const get=async u=>(await fetch(u)).json();
+const safe=v=>v==null?'—':v;
+const card=(label,value,sub='',score=null)=>`<div class="metric-card"><div class="metric-label">${label}</div><div class="metric-value">${value}</div><div class="metric-sub">${sub}</div>${score!==null?`<div class="scorebar"><i style="width:${Math.max(0,Math.min(100,score))}%"></i></div>`:''}</div>`;
+$('#navToggle')?.addEventListener('click',()=>$('#navLinks')?.classList.toggle('open'));
+document.querySelectorAll('.nav-links a').forEach(a=>a.addEventListener('click',()=>$('#navLinks')?.classList.remove('open')));
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active')}));
+(async()=>{
+ const [risk,market,news,freight,trends,vessels,zones]=await Promise.all(['/api/risk','/api/market-pulse','/api/news','/api/freight','/api/trends','/api/vessels','/api/risk-zones'].map(get));
+ const scores=Object.values(risk.scores);const composite=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);$('#composite').textContent=composite+'/100';$('#compositeBar').style.width=composite+'%';
+ $('#marketGrid').innerHTML=market.instruments.map(x=>card(x.name,safe(x.price),`${x.trend} · score ${x.signal_score}`,x.signal_score)).join('');
+ $('#riskGrid').innerHTML=Object.entries(risk.scores).map(([k,v])=>card(k.replaceAll('_',' '),v+'/100',v>=85?'High / critical':v>=65?'Elevated':'Moderate',v)).join('');
+ $('#newsList').innerHTML=news.items.map(n=>`<article class="news-card"><div class="meta"><span>${n.source}</span><span>${n.region}</span><span>${new Date(n.published_at).toLocaleString()}</span></div><h3>${n.headline}</h3><p>${n.summary}</p><div class="tags"><span class="tag">${n.category}</span><span class="tag">Market ${n.market_impact}/100</span><span class="tag">Oil ${n.oil_impact}/100</span><span class="tag">Confidence ${n.confidence}%</span></div></article>`).join('');
+ $('#freightList').innerHTML=`<div class="table-wrap"><table><thead><tr><th>Lane</th><th>Rate</th><th>Trend</th><th>Risk</th></tr></thead><tbody>${freight.lanes.map(x=>`<tr><td>${x.lane}</td><td>${safe(x.rate)}</td><td>${x.trend}</td><td>${x.risk}/100</td></tr>`).join('')}</tbody></table></div>`;
+ $('#trendTable').innerHTML=`<div class="table-wrap"><table><thead><tr><th>Asset</th><th>1H</th><th>1D</th><th>1W</th><th>Score</th></tr></thead><tbody>${trends.assets.map(x=>`<tr><td>${x.asset}</td><td>${x.h1}</td><td>${x.d1}</td><td>${x.w1}</td><td>${x.score}/100</td></tr>`).join('')}</tbody></table></div>`;
+ $('#vesselTable').innerHTML=`<div class="table-wrap"><table><thead><tr><th>Vessel</th><th>Type</th><th>Destination</th><th>Speed</th><th>Route risk</th><th>Insurance</th></tr></thead><tbody>${vessels.items.map(v=>`<tr><td>${v.name}</td><td>${v.vessel_type}</td><td>${v.destination}</td><td>${v.speed_knots} kn</td><td>${v.route_risk}/100</td><td>${v.insurance_risk}/100</td></tr>`).join('')}</tbody></table></div>`;
+ const map=L.map('mapCanvas',{worldCopyJump:true,zoomControl:true}).setView([23,35],2.5);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(map);
+ zones.items.forEach(z=>L.circleMarker([z.lat,z.lon],{radius:Math.max(8,z.shipping/8),weight:2,color:'#B7791F',fillColor:'#B7791F',fillOpacity:.18}).bindPopup(`<b>${z.name}</b><br>Geopolitical ${z.geopolitical}/100<br>Shipping ${z.shipping}/100<br>Insurance ${z.insurance}/100<br>Oil supply ${z.oil_supply}/100`).addTo(map));
+ vessels.items.forEach(v=>L.circleMarker([v.lat,v.lon],{radius:7,weight:2,color:'#1E6FD9',fillColor:'#1E6FD9',fillOpacity:.75}).bindPopup(`<b>${v.name}</b><br>${v.vessel_type}<br>To ${v.destination}<br>${v.speed_knots} knots<br>Route risk ${v.route_risk}/100`).addTo(map));
+})();
