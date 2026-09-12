@@ -1,7 +1,10 @@
 {
   "source": "AISStream.io",
   "live": false,
-  "status": "connected but no vessel messages received in sample window",
+  "status": "connected and subscription confirmed, but no vessel positions arrived in 60s",
+  "subscription_confirmed": true,
+  "messages_received": 2563,
+  "last_message_type": "PositionReport",
   "items": [],
-  "updated_at": "2026-09-12T21:11:03.479262+00:00"
+  "updated_at": "2026-09-12T21:18:04.335689+00:00"
 }
