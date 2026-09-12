@@ -1,7 +1,7 @@
 {
   "source": "UN Comtrade",
   "live": true,
-  "status": "Official annual merchandise import data for 7 countries.",
+  "status": "Official annual merchandise import data for 6 countries.",
   "period": "2025, 2024",
   "countries": [
     {
@@ -559,15 +559,24 @@
       ]
     },
     {
-      "code": "682",
-      "name": "Saudi Arabia",
-      "period": "2024",
+      "code": "276",
+      "name": "Germany",
+      "period": "2025",
       "goods": [
+        {
+          "hs_code": "85",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 226360935915.247,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
         {
           "hs_code": "84",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 32639738549.873,
+          "import_value_usd": 190139583943.089,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -576,16 +585,7 @@
           "hs_code": "87",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 26417090038.239,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "85",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 26255693880.674,
+          "import_value_usd": 157931462417.809,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -594,16 +594,7 @@
           "hs_code": "27",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 13153766550.622,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "71",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 10300394849.157,
+          "import_value_usd": 115528009818.092,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -612,34 +603,7 @@
           "hs_code": "30",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 9146103050.814,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "99",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 9092401918.557,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "73",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 7963735030.507,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "72",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 6153528911.762,
+          "import_value_usd": 85438507718.598,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -648,7 +612,7 @@
           "hs_code": "90",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 5996355036.224,
+          "import_value_usd": 54621253804.107,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -657,52 +621,7 @@
           "hs_code": "39",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 5320342938.725,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "10",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 5111963027.134,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "74",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 3912666895.783,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "94",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 3747223541.253,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "33",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 2881664145.292,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "02",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 2848906115.444,
+          "import_value_usd": 50984461100.092,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -711,88 +630,43 @@
           "hs_code": "29",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 2757216593.736,
+          "import_value_usd": 40311890658.088,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "38",
+          "hs_code": "71",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 2736296507.593,
+          "import_value_usd": 33573272693.582,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "89",
+          "hs_code": "73",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 2653641369.126,
+          "import_value_usd": 29455325380.446,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "04",
+          "hs_code": "72",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 2630840900.096,
+          "import_value_usd": 27419591290.413,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "40",
+          "hs_code": "94",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 2483643789.909,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "62",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 2305870396.22,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "19",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 2163929906.968,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "08",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 1972344878.425,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "21",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 1930395285.34,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "48",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 1871582544.944,
+          "import_value_usd": 26040797105.812,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -801,7 +675,16 @@
           "hs_code": "61",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 1813557427.461,
+          "import_value_usd": 25203007088.722,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "38",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 23332961000.459,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -810,7 +693,16 @@
           "hs_code": "76",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 1731795223.905,
+          "import_value_usd": 22894419815.093,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "62",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 22511274874.643,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -819,167 +711,7 @@
           "hs_code": "88",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 1725743897.923,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "44",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 1639989926.734,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        }
-      ]
-    },
-    {
-      "code": "276",
-      "name": "Germany",
-      "period": "2024",
-      "goods": [
-        {
-          "hs_code": "85",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 201169613195.356,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "84",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 168132546394.523,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "87",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 143627357879.335,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "27",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 111834547584.07,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "30",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 76398347864.045,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "90",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 48308137485.824,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "39",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 47043474712.805,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "29",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 40306150449.29,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "72",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 27093626666.269,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "73",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 26260659522.198,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "94",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 22495154128.527,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "61",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 21785013072.058,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "38",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 21129835036.679,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "76",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 20372728367.317,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "71",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 20228740976.41,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "62",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 19361481743.633,
+          "import_value_usd": 20346172655.472,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -988,25 +720,16 @@
           "hs_code": "40",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 16701001565.961,
+          "import_value_usd": 18423273080.291,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "99",
+          "hs_code": "08",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 14298751433.458,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "48",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 13784629863.749,
+          "import_value_usd": 16321875259.836,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1015,16 +738,25 @@
           "hs_code": "64",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 13427580386.902,
+          "import_value_usd": 16074109606.893,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "08",
+          "hs_code": "99",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 13298856869.278,
+          "import_value_usd": 15371577121.747,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "48",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 14859779116.208,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1033,16 +765,7 @@
           "hs_code": "74",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 12833502848.791,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "88",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 12327871360.381,
+          "import_value_usd": 14763828028.907,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1051,16 +774,7 @@
           "hs_code": "04",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 12032382462.895,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "26",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 9895829126.238,
+          "import_value_usd": 14055617422.154,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1069,34 +783,25 @@
           "hs_code": "33",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 9619025994.433,
+          "import_value_usd": 11572946746.597,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "22",
+          "hs_code": "26",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 9117472768.458,
+          "import_value_usd": 11539459163.762,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "28",
+          "hs_code": "95",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 8858975994.042,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "07",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 8774357342.359,
+          "import_value_usd": 11049022191.42,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1105,7 +810,25 @@
           "hs_code": "18",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 8574925389.885,
+          "import_value_usd": 10873981441.118,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "02",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 10448881874.888,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "22",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 10255120033.366,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1669,13 +1392,13 @@
     {
       "code": "410",
       "name": "South Korea",
-      "period": "2024",
+      "period": "2025",
       "goods": [
         {
           "hs_code": "27",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 162096246783.0,
+          "import_value_usd": 140092305192.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1684,7 +1407,7 @@
           "hs_code": "85",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 123832280940.0,
+          "import_value_usd": 127534844885.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1693,7 +1416,7 @@
           "hs_code": "84",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 66013327406.0,
+          "import_value_usd": 74711633690.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1702,16 +1425,7 @@
           "hs_code": "90",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 22789584216.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "87",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 19828976768.0,
+          "import_value_usd": 24756699229.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1720,16 +1434,16 @@
           "hs_code": "26",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 19199490027.0,
+          "import_value_usd": 20841393306.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "72",
+          "hs_code": "87",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 14242515170.0,
+          "import_value_usd": 20605562232.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1738,7 +1452,7 @@
           "hs_code": "29",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 14119832964.0,
+          "import_value_usd": 13615920966.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1747,79 +1461,7 @@
           "hs_code": "39",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 13114992977.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "28",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 12201151405.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "30",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 9471990098.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "38",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 8860857962.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "76",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 8740813961.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "73",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 8164001585.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "74",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 7322019798.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "62",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 7285026704.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "02",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 6770161681.0,
+          "import_value_usd": 13333714623.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1828,25 +1470,88 @@
           "hs_code": "71",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 6557080469.0,
+          "import_value_usd": 13233780489.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "61",
+          "hs_code": "72",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 5083166307.0,
+          "import_value_usd": 11834663055.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "10",
+          "hs_code": "28",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 4765144414.0,
+          "import_value_usd": 10313728657.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "38",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 9945402662.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "30",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 9746997840.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "76",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 9134221393.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "74",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 8218624215.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "73",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 8036471823.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "62",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 7048284973.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "02",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 6939587456.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1855,16 +1560,25 @@
           "hs_code": "03",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 4754848612.0,
+          "import_value_usd": 5162871811.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "88",
+          "hs_code": "61",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 4133968021.0,
+          "import_value_usd": 5142131349.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "10",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 4443868497.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1873,25 +1587,7 @@
           "hs_code": "94",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 3880948093.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "42",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 3850425559.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "64",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 3628105234.0,
+          "import_value_usd": 3889446162.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1900,7 +1596,34 @@
           "hs_code": "89",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 3151760491.0,
+          "import_value_usd": 3721555588.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "88",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 3716898573.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "42",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 3592940939.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "64",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 3507199567.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1909,16 +1632,7 @@
           "hs_code": "40",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 3069579231.0,
-          "quantity": 0.0,
-          "quantity_unit": -1,
-          "unit_value_usd": null
-        },
-        {
-          "hs_code": "44",
-          "product": "Unspecified commodity",
-          "partner": "World",
-          "import_value_usd": 2983658819.0,
+          "import_value_usd": 3160507944.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1927,16 +1641,25 @@
           "hs_code": "21",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 2836054954.0,
+          "import_value_usd": 2868664319.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
         },
         {
-          "hs_code": "23",
+          "hs_code": "44",
           "product": "Unspecified commodity",
           "partner": "World",
-          "import_value_usd": 2649449066.0,
+          "import_value_usd": 2798518113.0,
+          "quantity": 0.0,
+          "quantity_unit": -1,
+          "unit_value_usd": null
+        },
+        {
+          "hs_code": "95",
+          "product": "Unspecified commodity",
+          "partner": "World",
+          "import_value_usd": 2694342131.0,
           "quantity": 0.0,
           "quantity_unit": -1,
           "unit_value_usd": null
@@ -1951,5 +1674,5 @@
     "global_40ft_usd": null,
     "routes": []
   },
-  "updated_at": "2026-09-12T22:00:12.427104+00:00"
+  "updated_at": "2026-09-12T22:28:38.134984+00:00"
 }
