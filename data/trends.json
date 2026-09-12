@@ -1,1 +1,7 @@
-{"source":"PlaceOnUs","live":false,"assets":[],"status":"Waiting for historical market feed","updated_at":null}
+{
+  "source": "PlaceOnUs",
+  "live": false,
+  "assets": [],
+  "status": "Will activate after historical market feed is connected",
+  "updated_at": "2026-09-12T18:58:43.023060+00:00"
+}

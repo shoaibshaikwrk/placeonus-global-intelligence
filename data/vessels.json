@@ -1,1 +1,7 @@
-{"source":"VesselFinder","live":false,"status":"Waiting for scheduled collector / credentials","items":[],"updated_at":null}
+{
+  "source": "VesselFinder",
+  "live": false,
+  "status": "API key not configured",
+  "items": [],
+  "updated_at": "2026-09-12T18:58:43.023060+00:00"
+}

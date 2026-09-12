@@ -1,1 +1,13 @@
-{"source":"Initializing","live":false,"scores":{"geopolitical":0,"oil_supply":0,"shipping":0,"freight":0,"marine_insurance":0},"updated_at":null}
+{
+  "source": "PlaceOnUs derived from current headlines",
+  "live": true,
+  "scores": {
+    "geopolitical": 30,
+    "oil_supply": 25,
+    "shipping": 25,
+    "freight": 20,
+    "marine_insurance": 28
+  },
+  "method": "Transparent keyword-pressure heuristic; AI model not yet enabled.",
+  "updated_at": "2026-09-12T18:58:43.023060+00:00"
+}

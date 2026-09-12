@@ -1,1 +1,10 @@
-{"site":"news.placeonus.com","refresh_minutes":10,"sources":{"news":"initializing","markets":"initializing","vessels":"initializing"},"updated_at":null}
+{
+  "sources": {
+    "news": "error",
+    "markets": "partial",
+    "vessels": "not_connected"
+  },
+  "refresh_minutes": 10,
+  "site": "news.placeonus.com",
+  "updated_at": "2026-09-12T18:58:43.023060+00:00"
+}

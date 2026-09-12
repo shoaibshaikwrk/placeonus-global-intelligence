@@ -1,6 +1,7 @@
 {
-  "source": "Initializing live feed",
+  "source": "GDELT",
   "live": false,
   "items": [],
-  "updated_at": null
+  "error": "HTTP Error 429: Too Many Requests",
+  "updated_at": "2026-09-12T18:58:43.023060+00:00"
 }
