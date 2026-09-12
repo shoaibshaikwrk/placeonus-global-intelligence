@@ -1,0 +1,14 @@
+{
+  "source": "UN Comtrade",
+  "live": false,
+  "status": "Trade data source prepared. Connect UN Comtrade API for country and HS-code import data.",
+  "period": null,
+  "countries": [],
+  "container": {
+    "source": "Freight rate provider not connected",
+    "live": false,
+    "status": "Container spot-rate data requires a freight pricing source such as Freightos or Drewry with appropriate access.",
+    "global_40ft_usd": null,
+    "routes": []
+  }
+}
