@@ -41,6 +41,7 @@ jobs:
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
           AISSTREAM_API_KEY: ${{ secrets.AISSTREAM_API_KEY }}
           MARKET_DATA_API_KEY: ${{ secrets.MARKET_DATA_API_KEY }}
+          CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
         run: python collector.py
 
       - name: Commit changed snapshots
