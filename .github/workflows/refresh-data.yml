@@ -11,6 +11,7 @@ on:
       - 'collector.py'
       - 'collector_fast.py'
       - 'trade_enrichment.py'
+      - 'trade_focus.py'
       - '.github/workflows/refresh-data.yml'
 
 permissions:
@@ -49,6 +50,9 @@ jobs:
         env:
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
         run: timeout 120s python trade_enrichment.py || echo 'Trade enrichment timed out; preserving previous trade snapshot.'
+
+      - name: Limit trade data to focus countries
+        run: python trade_focus.py
 
       - name: Commit changed snapshots
         run: |
