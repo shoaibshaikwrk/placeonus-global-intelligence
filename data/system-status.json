@@ -2,10 +2,11 @@
   "sources": {
     "news": "error",
     "markets": "ok",
-    "trade": "ok",
-    "vessels": "ok"
+    "vessels": "ok",
+    "trade": "ok"
   },
   "refresh_minutes": 10,
   "site": "news.placeonus.com",
-  "updated_at": "2026-09-12T22:31:59.041050+00:00"
+  "mode": "fast",
+  "updated_at": "2026-09-13T01:03:01.232070+00:00"
 }
