@@ -9,6 +9,7 @@ on:
       - main
     paths:
       - 'collector.py'
+      - 'collector_fast.py'
       - 'trade_enrichment.py'
       - '.github/workflows/refresh-data.yml'
 
@@ -17,35 +18,37 @@ permissions:
 
 concurrency:
   group: refresh-intelligence-data
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
       - name: Install collector dependency
         run: python -m pip install --disable-pip-version-check 'websockets>=14,<16'
 
-      - name: Collect current intelligence
+      - name: Collect fast-moving intelligence
         env:
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
           AISSTREAM_API_KEY: ${{ secrets.AISSTREAM_API_KEY }}
           MARKET_DATA_API_KEY: ${{ secrets.MARKET_DATA_API_KEY }}
+        run: timeout 90s python collector_fast.py
+
+      - name: Enrich U.S. trade origins and ports
+        env:
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
-        run: |
-          python collector.py
-          python trade_enrichment.py
+        run: timeout 120s python trade_enrichment.py || echo 'Trade enrichment timed out; preserving previous trade snapshot.'
 
       - name: Commit changed snapshots
         run: |
