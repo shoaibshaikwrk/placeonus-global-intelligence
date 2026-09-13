@@ -1,3 +1,4 @@
+import concurrent.futures
 import json
 import os
 import urllib.parse
@@ -9,24 +10,19 @@ DATA = Path('data')
 TRADE = DATA / 'trade.json'
 KEY = os.getenv('CENSUS_API_KEY', '').strip()
 
-# Verified Schedule D port codes for major U.S. gateways.
+# Query a rotating/high-value set per run so the job stays safely under the platform limit.
+# Existing enriched rows are preserved and merged on later runs.
 PORT_CODES = [
-    '2704', # Los Angeles
-    '2709', # Long Beach
-    '4601', # New York/Newark
-    '1703', # Savannah
-    '5301', # Houston
-    '1601', # Charleston
-    '1401', # Norfolk-Newport News
-    '2811', # Oakland
-    '3001', # Seattle
-    '5203', # Port Everglades
-    '1303', # Baltimore
-    '2904', # Portland, OR
+    '2704',  # Los Angeles
+    '2709',  # Long Beach
+    '4601',  # New York/Newark
+    '1703',  # Savannah
+    '5301',  # Houston
+    '1601',  # Charleston
 ]
 
 
-def fetch_json(url, timeout=35):
+def fetch_json(url, timeout=8):
     req = urllib.request.Request(url, headers={'User-Agent': 'PlaceOnUs-Global-Intelligence/1.0'})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode('utf-8'))
@@ -50,7 +46,7 @@ def num(v):
 def candidate_periods():
     now = datetime.now(timezone.utc)
     out = []
-    for lag in range(2, 8):
+    for lag in (2, 3):
         y, m = now.year, now.month - lag
         while m <= 0:
             y -= 1
@@ -65,21 +61,27 @@ def port_rows(period, port):
         'COMM_LVL','GEN_VAL_MO','GEN_VAL_YR','VES_WGT_MO','VES_WGT_YR',
         'CNT_VAL_MO','CNT_VAL_YR'
     ])
-    base = {
+    params = urllib.parse.urlencode({
         'get': fields,
         'time': period,
         'PORT': port,
-        'COMM_LVL': 'HS2',
         'key': KEY,
-    }
-    url = 'https://api.census.gov/data/timeseries/intltrade/imports/porths?' + urllib.parse.urlencode(base)
-    try:
-        return table(url)
-    except Exception:
-        # Some Census releases reject COMM_LVL as a predicate. Retry and filter HS2 locally.
-        base.pop('COMM_LVL', None)
-        url = 'https://api.census.gov/data/timeseries/intltrade/imports/porths?' + urllib.parse.urlencode(base)
-        return table(url)
+    })
+    url = 'https://api.census.gov/data/timeseries/intltrade/imports/porths?' + params
+    return table(url)
+
+
+def fetch_period(period):
+    rows, errors = [], []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
+        futures = {pool.submit(port_rows, period, port): port for port in PORT_CODES}
+        for future in concurrent.futures.as_completed(futures):
+            port = futures[future]
+            try:
+                rows.extend(future.result())
+            except Exception as exc:
+                errors.append(f'{port}: {str(exc)[:100]}')
+    return rows, errors
 
 
 def collect():
@@ -87,21 +89,13 @@ def collect():
         return
 
     trade = json.loads(TRADE.read_text(encoding='utf-8'))
-    errors = []
-    rows = []
-    used_period = None
+    rows, errors, used_period = [], [], None
 
-    # Find the newest month that returns actual port records.
     for period in candidate_periods():
-        period_rows = []
-        for port in PORT_CODES:
-            try:
-                period_rows.extend(port_rows(period, port))
-            except Exception as exc:
-                errors.append(f'{port}: {str(exc)[:100]}')
+        period_rows, period_errors = fetch_period(period)
+        errors.extend(period_errors)
         if period_rows:
-            rows = period_rows
-            used_period = period
+            rows, used_period = period_rows, period
             break
 
     if not rows:
@@ -110,10 +104,12 @@ def collect():
         TRADE.write_text(json.dumps(trade, indent=2, ensure_ascii=False), encoding='utf-8')
         return
 
-    # Aggregate exact HS2 + origin-country + landing-port combinations.
     agg = {}
     for r in rows:
         hs = str(r.get('I_COMMODITY') or '')
+        # Keep only 2-digit HS totals to control file size and keep the dashboard readable.
+        if str(r.get('COMM_LVL') or '').upper() not in ('HS2', '2') and len(hs) != 2:
+            continue
         if len(hs) != 2 or not hs.isdigit():
             continue
         origin = (r.get('CTY_NAME') or '').strip()
@@ -142,46 +138,48 @@ def collect():
         rec['quantity'] += weight
         rec['containerized_value_usd'] += num(r.get('CNT_VAL_YR') or r.get('CNT_VAL_MO')) or 0.0
 
-    goods = list(agg.values())
-    for g in goods:
+    new_goods = list(agg.values())
+    for g in new_goods:
         if g['quantity'] > 0:
             g['unit_value_usd'] = g['import_value_usd'] / g['quantity']
         else:
             g['quantity'] = None
             g['quantity_unit'] = None
-    goods.sort(key=lambda x: x['import_value_usd'], reverse=True)
-    goods = goods[:400]
 
-    port_totals = {}
-    for g in goods:
-        k = (g['port_code'], g['port'])
-        port_totals[k] = port_totals.get(k, 0) + g['import_value_usd']
-    ports = [
-        {'code': code, 'name': name, 'port': name, 'import_value_usd': value, 'source': 'U.S. Census International Trade — Port HS'}
-        for (code, name), value in sorted(port_totals.items(), key=lambda kv: kv[1], reverse=True)
-    ]
+    countries = trade.get('countries') or []
+    existing_us = next((c for c in countries if str(c.get('code')) == '842'), None)
+    previous_enriched = []
+    if existing_us:
+        previous_enriched = [g for g in (existing_us.get('goods') or []) if g.get('port') and g.get('partner') not in (None, '', 'World')]
+
+    merged = {}
+    for g in previous_enriched + new_goods:
+        k = (g.get('hs_code'), g.get('partner'), g.get('port_code'), g.get('port'))
+        merged[k] = g
+    goods = sorted(merged.values(), key=lambda x: x.get('import_value_usd') or 0, reverse=True)[:500]
 
     if goods:
-        countries = trade.get('countries') or []
-        us = next((c for c in countries if str(c.get('code')) == '842'), None)
+        port_totals = {}
+        for g in goods:
+            k = (g.get('port_code'), g.get('port'))
+            port_totals[k] = port_totals.get(k, 0) + (g.get('import_value_usd') or 0)
+        ports = [
+            {'code': code, 'name': name, 'port': name, 'import_value_usd': value, 'source': 'U.S. Census International Trade — Port HS'}
+            for (code, name), value in sorted(port_totals.items(), key=lambda kv: kv[1], reverse=True)
+        ]
         replacement = {
-            'code': '842',
-            'name': 'United States',
-            'period': used_period,
-            'goods': goods,
-            'ports': ports,
-            'origin_live': True,
-            'port_live': True,
+            'code': '842', 'name': 'United States', 'period': used_period,
+            'goods': goods, 'ports': ports, 'origin_live': True, 'port_live': True,
             'source': 'U.S. Census International Trade — Port HS'
         }
-        if us:
-            countries[countries.index(us)] = replacement
+        if existing_us:
+            countries[countries.index(existing_us)] = replacement
         else:
             countries.insert(0, replacement)
         trade['countries'] = countries
         trade['source'] = 'UN Comtrade + U.S. Census International Trade'
-        trade['port_status'] = f'U.S. origin-country and landing-port detail connected for {len(ports)} major ports.'
-        trade['status'] = 'Official trade data. U.S. detailed rows contain reported origin country, HS2 product, import value and landing port from Census Port HS data.'
+        trade['port_status'] = f'U.S. origin-country and landing-port detail connected for {len(ports)} ports.'
+        trade['status'] = 'Official trade data. U.S. detailed rows contain origin country, HS2 product, import value and landing port from Census Port HS data.'
         trade['updated_at'] = datetime.now(timezone.utc).isoformat()
         trade['errors'] = errors[:8]
 
